@@ -86,3 +86,35 @@ history <- model %>% fit(
   batch_size = 512,
   validation_data = list(x_val, y_val)
 )
+
+# plotting the training and validation loss and accuracy 
+str(history$metrics)
+plot(history)
+
+# converting history to a data frame 
+history_df <- as.data.frame(history)
+str(history_df)
+
+# retraining the model from scratch
+model <- keras_model_sequential() %>%
+  layer_dense(16, activation = "relu") %>%
+  layer_dense(16, activation = "relu") %>%
+  layer_dense(1, activation = "sigmoid")
+
+# compiling the model 
+model %>% compile(
+  optimizer = "rmsprop",
+  loss = "binary_crossentropy",
+  metrics = "accuracy"
+)
+
+# training the model for 4 epochs 
+model %>% fit(x_train, y_train, epochs = 4, batch_size = 512)
+
+# evaluating the model on the test data 
+results <- model %>% evaluate(x_test, y_test)
+results
+
+# finally using the trained model to generate predictions on the new data 
+model %>% predict(x_test)
+
