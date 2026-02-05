@@ -54,3 +54,35 @@ x_test <- vectorize_sequences(test_data)
 
 # displaying the structure of the vectoried trained data 
 str(x_train)
+
+# converting the train and test lables to numeric
+y_train <- as.numeric(train_labels)
+y_test <- as.numeric(test_labels)
+
+# Building the neural network model
+model <- keras_model_sequential() %>%
+  layer_dense(16, activation = "relu") %>%  # intermediate layer with 16 units
+  layer_dense(16, activation = "relu") %>%  # 2nd intermediate layer with 16 units
+  layer_dense(1, activation = "sigmoid")    # layer 3 (output layer which gives the scalar prediction regarding the sentiment of the current review)
+
+# compiling the model with loss function, optimizer and the metrics 
+model %>% compile(
+  optimizer = "rmsprop",
+  loss = "binary_crossentropy",
+  metrics = "accuracy"
+)
+
+# setting aside a validation set from the training data 
+x_val <- x_train[seq(10000), ]
+partial_x_train <- x_train[-seq(10000), ]
+y_val <- y_train[seq(10000)]
+partial_y_train <- y_train[-seq(10000)]
+
+# training the model with the fit function
+history <- model %>% fit(
+  partial_x_train,
+  partial_y_train,
+  epochs = 20,
+  batch_size = 512,
+  validation_data = list(x_val, y_val)
+)
